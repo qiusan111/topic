@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>生日快乐！🎉</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background-color: #000;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin: 20px 0;
+      text-shadow: 0 0 20px #ff69b4, 0 0 30px #ff69b4;
+    }
+
+    .typing {
+      font-size: 1.5em;
+      border-right: .15em solid #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 0;
+      animation: typing 6s steps(50, end) forwards, blink .75s step-end infinite;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink {
+      0%, 100% { border-color: transparent }
+      50% { border-color: white }
+    }
+
+    .emoji {
+      font-size: 2em;
+    }
+
+    /* 飘动的气球和彩带 */
+    .float {
+      position: absolute;
+      bottom: -100px;
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      from {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateY(-110vh);
+        opacity: 0;
+      }
+    }
+
+    /* 玫瑰 */
+    .rose {
+      position: absolute;
+      width: 80px;
+      bottom: 20px;
+    }
+
+    .rose.left {
+      left: 30px;
+    }
+
+    .rose.right {
+      right: 30px;
+      transform: scaleX(-1);
+    }
+
+    /* 烟花背景 */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="fireworks"></canvas>
+
+  <h1>🎉 生日快乐！Happy Birthday! 🎂</h1>
+  <div class="typing" id="typing-text"></div>
+
+  <!-- 飘动气球和彩带 -->
+  <script>
+    const emojis = ["🎈", "🎉", "🎊", "🎈", "🎉"];
+    for (let i = 0; i < 30; i++) {
+      const span = document.createElement("span");
+      span.className = "float";
+      span.style.left = Math.random() * 100 + "vw";
+      span.style.animationDuration = 4 + Math.random() * 6 + "s";
+      span.style.fontSize = 20 + Math.random() * 30 + "px";
+      span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      document.body.appendChild(span);
+    }
+  </script>
+
+  <!-- 两侧玫瑰花 -->
+  <img src="https://img.icons8.com/emoji/96/rose.png" class="rose left" />
+  <img src="https://img.icons8.com/emoji/96/rose.png" class="rose right" />
+
+  <!-- 打字效果 -->
+  <script>
+    const message = "哦！又年长一岁了，要少点烦恼 ( ๑˘︶˘๑ )🌈\n天天快乐，开心 (≧∇≦)/✌️🎈🎉";
+    const textDiv = document.getElementById("typing-text");
+
+    let i = 0;
+    function type() {
+      if (i < message.length) {
+        textDiv.textContent += message.charAt(i);
+        i++;
+        setTimeout(type, 80);
+      }
+    }
+
+    type();
+  </script>
+
+  <!-- 背景音乐（中英文生日快乐歌） -->
+  <audio autoplay loop>
+    <source src="https://cdn.pixabay.com/audio/2021/11/17/audio_97ba1dfc6d.mp3" type="audio/mpeg">
+    您的浏览器不支持音频播放。
+  </audio>
+
+  <!-- 烟花动画 -->
+
+<script>
+  const canvas = document.getElementById("fireworks");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const fireworks = [];
+
+  class Particle {
+    constructor(x, y, angle, speed, color) {
+      this.x = x;
+      this.y = y;
+      this.speed = speed;
+      this.angle = angle;
+      this.radius = 2 + Math.random() * 2;
+      this.life = 1;
+      this.color = color;
+      this.fade = 0.015 + Math.random() * 0.01;
+    }
+
+    update() {
+      this.x += Math.cos(this.angle) * this.speed;
+      this.y += Math.sin(this.angle) * this.speed;
+      this.speed *= 0.98;
+      this.life -= this.fade;
+    }
+
+    draw(ctx) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.globalAlpha = this.life;
+      ctx.shadowColor = this.color;
+      ctx.shadowBlur = 10;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  function createFirework() {
+    const x = Math.random() * canvas.width * 0.8 + canvas.width * 0.1;
+    const y = Math.random() * canvas.height * 0.3 + canvas.height * 0.1;
+    const colors = ["#FFD700", "#FF69B4", "#87CEFA", "#ADFF2F", "#FF6347", "#ffffff"];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    for (let i = 0; i < 100; i++) {
+      const angle = (Math.PI * 2) * (i / 100);
+      const speed = Math.random() * 4 + 2;
+      fireworks.push(new Particle(x, y, angle, speed, color));
+    }
+  }
+
+  function animate() {
+    ctx.fillStyle = "rgba(0, 0, 20, 0.2)"; // 夜空感
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = fireworks.length - 1; i >= 0; i--) {
+      const p = fireworks[i];
+      p.update();
+      p.draw(ctx);
+      if (p.life <= 0) {
+        fireworks.splice(i, 1);
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  setInterval(createFirework, 1500);
+  animate();
+
+  window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+</script>
+
+
+</body>
+</html>
